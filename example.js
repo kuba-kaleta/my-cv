@@ -8,9 +8,6 @@ const uri = check_env(process.env.BROKER_URI);
 const username = "anything";
 const password = check_env(process.env.BROKER_TOKEN);
 
-// Specify a topic name to subscribe to and publish on
-let topic = check_env(process.env.BROKER_TOPIC);
-
 // Configure and create the MQTT client
 const client = mqtt.connect(uri, {
   protocolVersion: 5,
@@ -28,34 +25,3 @@ client.on("error", function (err) {
   client.end();
   process.exit();
 });
-
-// Connect to your broker
-client.on("connect", function () {
-  console.log(`🌎 connected to ${process.env.BROKER_URI}!`);
-  // Subscribe to a topic
-  client.subscribe(topic, function (err) {
-    if (!err) {
-      console.log(`✅ subscribed to ${topic}`);
-      // Publish a message!
-      client.publish(topic, "My first MQTT message");
-    }
-  });
-});
-
-// Start waiting for messages
-client.on("message", async function (topic, message) {
-  console.log(`received a message: ${message.toString()}`);
-
-  // Goodbye!
-  client.end();
-  process.exit();
-});
-
-// Return variable or throw error
-function check_env(env) {
-  if (!env) {
-    throw "BROKER_URI, BROKER_TOKEN and BROKER_TOPIC must be set.";
-  }
-
-  return env;
-}
